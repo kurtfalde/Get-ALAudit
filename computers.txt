@@ -1,0 +1,2 @@
+pc1.contoso.com
+pc2.contoso.com
