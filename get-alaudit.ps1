@@ -35,13 +35,13 @@ $computers += Get-Content -Path ./computers.txt
 $groups = @()
 $groups = "Applocker-Audit, AppLocker-Enforce"
 Foreach($group in $groups) {
-    $computers += Get-ADGroupMember -Identity $group
+    $computers += (Get-ADGroupMember -Identity $group).name
 }
 
 
   $ALAuditData = $WorkingDirectory + "\ALAuditData.csv"
   If(Test-Path -Path $ALAuditData){
-    $ALAuditDataTimeString = (Get-ChildItem -Path $ALAuditData).creationtime.tostring("dd.MM.yyyy.HH.mm")
+    $ALAuditDataTimeString = (Get-ChildItem -Path $ALAuditData).creationtime.tostring("MM.dd.yyyy.HH.mm")
     $ALAuditDataRenamed = $($WorkingDirectory) + "\ALAuditData" + $($ALAuditDataTimeString) + ".csv"
     Rename-Item -Path $ALAuditData -newname $ALAuditDataRenamed
   }
