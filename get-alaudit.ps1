@@ -11,6 +11,8 @@ RPC connectivity to remote systems to connect to via get-winevent to gather back
 
 #>
 
+<#
+
 #Check if NuGet is installed on system and if not then install it used to get PoshRSJob module
 If((Get-PackageProvider -Name NuGet) -eq $null){
   Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser  
@@ -21,9 +23,14 @@ If((Get-Module -ListAvailable -name PoshRSJob) -eq $null){
   Install-Module -Name PoshRSJob -Scope CurrentUser -Force  
 }
 Install-Module -Name PoshRSJob -Scope CurrentUser -Force
+#>
 
 #Set working directory
-$WorkingDirectory = (Get-Item -Path ".\" -Verbose).FullName
+$WorkingDirectory = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
+cd $WorkingDirectory
+
+#Import PoshRSJob module from same directory
+Import-Module -Name $WorkingDirectory\PoshRSJob -Verbose
 
 #Declaring variables
 $computers = @()
@@ -31,22 +38,32 @@ $computers = @()
 # Get computer list from text file in local working directory
 $computers += Get-Content -Path ./computers.txt
 
-# Get computer list based on groups in AD
+# Get computer list based on groups in AD ad groups with comma separators if this is to be used
 $groups = @()
-$groups = "Applocker-Audit, AppLocker-Enforce"
+#$groups = ""
+If($groups -ne $null){
 Foreach($group in $groups) {
     $computers += (Get-ADGroupMember -Identity $group).name
 }
+}
 
-
-  $ALAuditData = $WorkingDirectory + "\ALAuditData.csv"
-  If(Test-Path -Path $ALAuditData){
-    $ALAuditDataTimeString = (Get-ChildItem -Path $ALAuditData).creationtime.tostring("MM.dd.yyyy.HH.mm")
-    $ALAuditDataRenamed = $($WorkingDirectory) + "\ALAuditData" + $($ALAuditDataTimeString) + ".csv"
-    Rename-Item -Path $ALAuditData -newname $ALAuditDataRenamed
+# Add computers to array based on an OU in AD example to put in the OUs line below "OU=something,dc=contoso,dc=com,ou=somethingelse,dc=contoso,dc=com"
+$OUs = @()
+#$OUs = ""
+if($OUs -ne $null){
+Foreach($OU in $OUs){
+    $computers += (get-adcomputer -filter * -searchbase $OU).name
+}
+}
+ 
+ 
+  $ALAuditDataFile = $WorkingDirectory + "\ALAuditData.csv"
+  If(Test-Path -Path $ALAuditDataFile){
+    $ALAuditDataTimeString = (Get-ChildItem -Path $ALAuditDataFile).creationtime.tostring("MM.dd.yyyy.HH.mm")
+    $ALAuditDataFileRenamed = $($WorkingDirectory) + "\ALAuditData" + $($ALAuditDataTimeString) + ".csv"
+    Rename-Item -Path $ALAuditDataFile -newname $ALAuditDataFileRenamed
   }
-  #$alauditmtx = New-Object System.Threading.Mutex($false, "ALAuditMutex")
-  #$ALAuditScriptBlock = get-command $($WorkingDirectory)\ALAuditScriptBlock.ps1 | Select-Object -ExpandProperty ScriptBlock
-  #$computers | Start-RSJob -ScriptBlock $DCsScriptBlock -name {$_} -Throttle $RunspaceThreads -ArgumentList $alauditmtx, $ALAuditData
 
-#>
+  $alauditmtx = New-Object System.Threading.Mutex($false, "ALAuditMutex")
+  $ALAuditScriptBlock = get-command "$($WorkingDirectory)\alauditscriptblock.ps1" | Select-Object -ExpandProperty ScriptBlock
+  $computers | Start-RSJob -ScriptBlock $ALAuditScriptBlock -name {$_} -Throttle $RunspaceThreads -ArgumentList $alauditmtx, $ALAuditDataFile
