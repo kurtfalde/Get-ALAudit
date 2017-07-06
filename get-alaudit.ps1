@@ -59,7 +59,7 @@ Foreach($OU in $OUs){
  
   $ALAuditDataFile = $WorkingDirectory + "\ALAuditData.csv"
   If(Test-Path -Path $ALAuditDataFile){
-    $ALAuditDataTimeString = (Get-ChildItem -Path $ALAuditDataFile).creationtime.tostring("MM.dd.yyyy.HH.mm")
+    $ALAuditDataTimeString = (Get-ChildItem -Path $ALAuditDataFile).lastwritetime.tostring("MM.dd.yyyy.HH.mm")
     $ALAuditDataFileRenamed = $($WorkingDirectory) + "\ALAuditData" + $($ALAuditDataTimeString) + ".csv"
     Rename-Item -Path $ALAuditDataFile -newname $ALAuditDataFileRenamed
   }
