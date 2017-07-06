@@ -17,7 +17,7 @@
 
         $aleventcsvdata = New-Object psobject
 
-        $computer = get-adcomputer -Identity $computer 
+        $computer = get-adcomputer -Identity $computer -Properties OperatingSystem 
         $ComputerOU = $computer.DistinguishedName -creplace "^[^,]*,",""       
 
         #Get events from Microsoft-Windows-AppLocker/EXE and DLL log
@@ -28,23 +28,25 @@
             
             $exedlleventxml = [xml]$exedllevent.ToXml()
         
-            $user = (Get-ADUser $exedlleventxml.Event.UserData.RuleAndFileData.TargetUser).UserPrincipalName
+            $userprincipalname = (Get-ADUser $exedlleventxml.Event.UserData.RuleAndFileData.TargetUser).UserPrincipalName
+            $username = (Get-ADUser $exedlleventxml.Event.UserData.RuleAndFileData.TargetUser).Name
 
             $Computercsv | Add-Member noteproperty ComputerOU $ComputerOU
 
             Clear-Item $aleventcsvdata
        
             $aleventcsvdata = New-Object PSObject -Property @{            
-                MachineName      = $computer.name                 
-                MachineOU        = $ComputerOU             
-                MachineOS        = $computer.OperatingSystem
-                UserName         = $user            
-                PolicyName       = $exedlleventxml.Event.UserData.RuleAndFileData.PolicyName           
-                CreateDate       = $exedlleventxml.Event.System.TimeCreated           
-                EventID          = $exedlleventxml.Event.System.EventID           
-                FilePath         = $exedlleventxml.Event.UserData.RuleAndFileData.FilePath         
-                FileHash         = $exedlleventxml.Event.UserData.RuleAndFileData.FileHash           
-                Fqbn             = $exedlleventxml.Event.UserData.RuleAndFileData.Fqbn           
+                MachineName         = $computer.name                 
+                MachineOU           = $ComputerOU             
+                MachineOS           = $computer.OperatingSystem
+                UserPrincipalName   = $userprincipalname            
+                UserName            = $username
+                PolicyName          = $exedlleventxml.Event.UserData.RuleAndFileData.PolicyName           
+                CreateDate          = $exedlleventxml.Event.System.TimeCreated.SystemTime           
+                EventID             = $exedlleventxml.Event.System.EventID           
+                FilePath            = $exedlleventxml.Event.UserData.RuleAndFileData.FilePath         
+                FileHash            = $exedlleventxml.Event.UserData.RuleAndFileData.FileHash           
+                Fqbn                = $exedlleventxml.Event.UserData.RuleAndFileData.Fqbn           
          
                 }
 
