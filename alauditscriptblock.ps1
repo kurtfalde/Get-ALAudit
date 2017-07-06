@@ -22,7 +22,7 @@
 
         #Get events from Microsoft-Windows-AppLocker/EXE and DLL log
 
-        $exedllevents = Get-WinEvent -LogName 'Microsoft-Windows-AppLocker/EXE and DLL' -FilterXPath "*[System[(EventID=8003 or EventID=8004)]]"
+        $exedllevents = Get-WinEvent -ComputerName $computer -LogName 'Microsoft-Windows-AppLocker/EXE and DLL' -FilterXPath "*[System[(EventID=8003 or EventID=8004)]]"
 
         foreach($exedllevent in $exedllevents){
             
@@ -57,7 +57,7 @@
         }
 
 
-        $scriptmsievents = Get-WinEvent -LogName 'Microsoft-Windows-AppLocker/MSI and Script' -FilterXPath "*[System[(EventID=8006 or EventID=8007)]]"
+        $scriptmsievents = Get-WinEvent -ComputerName $computer -LogName 'Microsoft-Windows-AppLocker/MSI and Script' -FilterXPath "*[System[(EventID=8006 or EventID=8007)]]"
 
         foreach($scriptmsievent in $scriptmsievents){
             
