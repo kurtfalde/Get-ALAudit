@@ -10,7 +10,7 @@
 
         #Test Connection and exit if not available
 
-        If((Test-Connection -ComputerName $computer.name -Quiet) -eq $false){exit}
+        If((Test-Connection -ComputerName $computer -Quiet) -eq $false){exit}
 
         
         #Creating object to output to .csv
