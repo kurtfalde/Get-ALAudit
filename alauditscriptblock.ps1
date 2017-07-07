@@ -17,12 +17,12 @@
 
         $aleventcsvdata = New-Object psobject
 
-        $computer = get-adcomputer -Identity $computer -Properties OperatingSystem 
+        $computer = get-adcomputer -Identity $computer.name -Properties OperatingSystem 
         $ComputerOU = $computer.DistinguishedName -creplace "^[^,]*,",""       
 
         #Get events from Microsoft-Windows-AppLocker/EXE and DLL log
 
-        $exedllevents = Get-WinEvent -ComputerName $computer -LogName 'Microsoft-Windows-AppLocker/EXE and DLL' -FilterXPath "*[System[(EventID=8003 or EventID=8004)]]"
+        $exedllevents = Get-WinEvent -ComputerName $computer.name -LogName 'Microsoft-Windows-AppLocker/EXE and DLL' -FilterXPath "*[System[(EventID=8003 or EventID=8004)]]"
 
         foreach($exedllevent in $exedllevents){
             
