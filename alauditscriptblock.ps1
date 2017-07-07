@@ -65,9 +65,9 @@
         
             #Test for constrained language test scripts if so then continue to next event
             # Match partial path in temp directory with form XXXXXXXX.XXX.PS* or __PSScriptPolicyTest_XXXXXXXX.XXX.PS*
-	        $pattern1 = "\\APPDATA\\LOCAL\\TEMP\\[A-Z0-9]{8}\.[A-Z0-9]{3}\.PS"
+	    $pattern1 = "\\APPDATA\\LOCAL\\TEMP\\[A-Z0-9]{8}\.[A-Z0-9]{3}\.PS"
             $pattern2 = "\\APPDATA\\LOCAL\\TEMP\\[0-9]{1}\\[A-Z0-9]{8}\.[A-Z0-9]{3}\.PS"
-	        $pattern3 = "\\APPDATA\\LOCAL\\TEMP\\(__PSScriptPolicyTest_)?[A-Z0-9]{8}\.[A-Z0-9]{3}\.PS"
+	    $pattern3 = "\\APPDATA\\LOCAL\\TEMP\\(__PSScriptPolicyTest_)?[A-Z0-9]{8}\.[A-Z0-9]{3}\.PS"
             $pattern4 = "\\APPDATA\\LOCAL\\TEMP\\[0-9]{1}\\(__PSScriptPolicyTest_)?[A-Z0-9]{8}\.[A-Z0-9]{3}\.PS"
 
             If($scriptmsieventxml.Event.UserData.RuleAndFileData.FilePath -match $pattern1){continue}
